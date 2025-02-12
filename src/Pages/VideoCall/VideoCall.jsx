@@ -11,7 +11,7 @@ import VideoControls from "../videoControls/videoControlls";
 // import ChatBox from "../components/ChatBox";
 import ChatBox from "../chatbox/chatbox";
 
-const socket = io("http://localhost:4000");
+const socket = io("https://videocom-backend.vercel.app/");
 
 const VideoCall = () => {
   const { roomId } = useParams();
