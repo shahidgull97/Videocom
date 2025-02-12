@@ -36,7 +36,11 @@ const VideoCall = () => {
         }
 
         localStreamRef.current = stream;
-        peerConnection.current = new RTCPeerConnection();
+
+        // ✅ Fix 1: Add STUN Server for better connectivity
+        peerConnection.current = new RTCPeerConnection({
+          iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
+        });
 
         stream
           .getTracks()
@@ -44,6 +48,16 @@ const VideoCall = () => {
 
         socket.emit("join-room", roomId);
 
+        // ✅ Fix 2: Automatically send offer when a user joins
+        socket.on("user-joined", async () => {
+          if (!peerConnection.current) return;
+
+          const offer = await peerConnection.current.createOffer();
+          await peerConnection.current.setLocalDescription(offer);
+          socket.emit("offer", { offer, roomId });
+        });
+
+        // Handle offer
         socket.on("offer", async (offer) => {
           if (!peerConnection.current) return;
           await peerConnection.current.setRemoteDescription(
@@ -54,6 +68,7 @@ const VideoCall = () => {
           socket.emit("answer", { answer, roomId });
         });
 
+        // Handle answer
         socket.on("answer", async (answer) => {
           if (!peerConnection.current) return;
           await peerConnection.current.setRemoteDescription(
@@ -61,11 +76,14 @@ const VideoCall = () => {
           );
         });
 
+        // Handle ICE Candidates
         socket.on("ice-candidate", (candidate) => {
-          if (peerConnection.current) {
-            peerConnection.current.addIceCandidate(
-              new RTCIceCandidate(candidate)
-            );
+          if (candidate && peerConnection.current) {
+            peerConnection.current
+              .addIceCandidate(new RTCIceCandidate(candidate))
+              .catch((error) =>
+                console.error("Failed to add ICE candidate:", error)
+              );
           }
         });
 
@@ -79,16 +97,15 @@ const VideoCall = () => {
             }
           };
 
+          // ✅ Fix 4: Ensure remote stream updates correctly
           peerConnection.current.ontrack = (event) => {
             if (remoteVideoRef.current) {
-              remoteVideoRef.current.srcObject = event.streams[0];
+              setTimeout(() => {
+                remoteVideoRef.current.srcObject = event.streams[0];
+              }, 100);
             }
             setIsConnected(true);
           };
-          //   chat feature
-          //   socket.on("receive-message", (message) => {
-          //     setMessages((prev) => [...prev, message]);
-          //   });
         }
       } catch (error) {
         console.error("Error accessing media devices:", error);
