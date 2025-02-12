@@ -11,7 +11,7 @@ import VideoControls from "../videoControls/videoControlls";
 // import ChatBox from "../components/ChatBox";
 import ChatBox from "../chatbox/chatbox";
 
-const socket = io("https://videocom-backend.vercel.app/");
+const socket = io("https://videocom-backend.onrender.com");
 
 const VideoCall = () => {
   const { roomId } = useParams();
