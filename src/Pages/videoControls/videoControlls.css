@@ -1,0 +1,36 @@
+/* frontend/src/styles/videoControls.css */
+.video-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 10px;
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.video-controls button {
+  padding: 10px 15px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.video-controls button.active {
+  background-color: green;
+  color: white;
+}
+
+.video-controls .end-call {
+  background-color: red;
+  color: white;
+}
+
+.video-controls button:hover {
+  opacity: 0.8;
+}

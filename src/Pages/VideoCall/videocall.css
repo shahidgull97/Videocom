@@ -1,0 +1,31 @@
+/* frontend/src/styles/home.css */
+.home-container {
+  text-align: center;
+  padding: 20px;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.invite-section {
+  margin-top: 20px;
+}
+
+.invite-section input {
+  width: 60%;
+  padding: 5px;
+  margin-right: 10px;
+  text-align: center;
+}

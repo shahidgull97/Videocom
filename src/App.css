@@ -1,0 +1,145 @@
+/* General Page Styling */
+#root {
+  font-family: Arial, sans-serif;
+  background-color: #1e1e1e;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main Container */
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Title Styling */
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* Authentication Buttons */
+.auth-buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.auth-buttons button {
+  padding: 12px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  background: #007bff;
+  color: white;
+  border-radius: 8px;
+  transition: 0.3s;
+}
+
+.auth-buttons button:hover {
+  background: #0056b3;
+}
+
+/* Divider */
+hr {
+  width: 60%;
+  border: 1px solid #444;
+  margin: 20px 0;
+}
+
+/* Create Room Button */
+button.create-room {
+  background-color: #0084ff;
+  padding: 14px 28px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: 0.3s;
+}
+
+button.create-room:hover {
+  background-color: #005ecb;
+}
+
+/* Invite Section */
+.invite-section {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  width: 60%;
+  text-align: center;
+}
+
+.invite-section input {
+  padding: 10px;
+  width: 80%;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.invite-section button {
+  padding: 10px 15px;
+  margin-top: 10px;
+  font-size: 16px;
+  background-color: #ffcc00;
+  color: black;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: 0.3s;
+}
+
+.invite-section button:hover {
+  background-color: #e0a800;
+}
+
+/* Join Room Section */
+.join-room {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.join-room input {
+  padding: 12px;
+  font-size: 16px;
+  width: 250px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background: #333;
+  color: white;
+}
+
+.join-room input::placeholder {
+  color: #bbb;
+}
+
+.join-room button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: 0.3s;
+}
+
+.join-room button:hover {
+  background-color: #218838;
+}
