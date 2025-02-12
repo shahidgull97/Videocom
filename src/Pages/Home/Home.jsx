@@ -13,7 +13,7 @@ const Home = () => {
   const handleCreateRoom = () => {
     const newRoomId = uuidV4(); // Generate unique room ID
     setRoomId(newRoomId);
-    setInviteLink(`${window.location.origin}/room/${newRoomId}`);
+    setInviteLink(`room/${newRoomId}`);
   };
 
   // Join existing room
