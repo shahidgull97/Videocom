@@ -11,8 +11,8 @@ import VideoControls from "../videoControls/videoControlls";
 // import ChatBox from "../components/ChatBox";
 import ChatBox from "../chatbox/chatbox";
 
-// const socket = io("http://videocom-backend.onrender.com");
-const socket = io("http://192.168.31.51:4000");
+const socket = io("http://videocom-backend.onrender.com");
+// const socket = io("http://192.168.31.51:4000");
 
 const VideoCall = () => {
   const { roomId } = useParams();
