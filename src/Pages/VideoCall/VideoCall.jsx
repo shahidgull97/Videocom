@@ -11,7 +11,8 @@ import VideoControls from "../videoControls/videoControlls";
 // import ChatBox from "../components/ChatBox";
 import ChatBox from "../chatbox/chatbox";
 
-const socket = io("https://videocom-backend.onrender.com");
+// const socket = io("http://videocom-backend.onrender.com");
+const socket = io("http://192.168.31.51:4000");
 
 const VideoCall = () => {
   const { roomId } = useParams();
@@ -22,54 +23,66 @@ const VideoCall = () => {
   const [isMicOn, setIsMicOn] = useState(true);
   const [isVideoOn, setIsVideoOn] = useState(true);
   const localStreamRef = useRef(null);
+  console.log("[CLIENT] Component rendering for user...");
+  console.log("[CLIENT] roomId:", roomId);
 
   useEffect(() => {
+    console.log("[CLIENT] useEffect triggered for room:", roomId);
     const initializeCall = async () => {
+      console.log("[CLIENT] initializeCall started"); // Log at the start
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
           audio: true,
         });
-
+        console.log("[CLIENT] stream started"); // Log at the start
         if (localVideoRef.current) {
           localVideoRef.current.srcObject = stream;
         }
-
+        console.log("you are insede userRef with ", roomId);
         localStreamRef.current = stream;
 
-        // ✅ Fix 1: Add STUN Server for better connectivity
+        // ✅ Add STUN server for better connectivity
         peerConnection.current = new RTCPeerConnection({
           iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
         });
 
-        stream
-          .getTracks()
-          .forEach((track) => peerConnection.current.addTrack(track, stream));
+        stream.getTracks().forEach((track) => {
+          peerConnection.current.addTrack(track, stream);
+        });
 
-        socket.emit("join-room", roomId);
+        // ✅ Listen for new users **BEFORE** joining the room
+        socket.on("user-joined", async (id) => {
+          console.log(`[CLIENT] New user joined: ${id}`);
 
-        // ✅ Fix 2: Automatically send offer when a user joins
-        socket.on("user-joined", async () => {
           if (!peerConnection.current) return;
 
           const offer = await peerConnection.current.createOffer();
           await peerConnection.current.setLocalDescription(offer);
-          socket.emit("offer", { offer, roomId });
+          socket.emit("offer", { offer, target: id });
         });
 
-        // Handle offer
-        socket.on("offer", async (offer) => {
+        // ✅ Now, join the room
+        console.log("[CLIENT] Checking roomId before emitting:", roomId);
+
+        socket.emit("join-room", roomId);
+        console.log(`[CLIENT] Emitting join-room event for room: ${roomId}`);
+
+        // Handle incoming offer
+        socket.on("offer", async ({ offer, target }) => {
           if (!peerConnection.current) return;
+
           await peerConnection.current.setRemoteDescription(
             new RTCSessionDescription(offer)
           );
+
           const answer = await peerConnection.current.createAnswer();
           await peerConnection.current.setLocalDescription(answer);
-          socket.emit("answer", { answer, roomId });
+          socket.emit("answer", { answer, target });
         });
 
         // Handle answer
-        socket.on("answer", async (answer) => {
+        socket.on("answer", async ({ answer }) => {
           if (!peerConnection.current) return;
           await peerConnection.current.setRemoteDescription(
             new RTCSessionDescription(answer)
@@ -79,41 +92,38 @@ const VideoCall = () => {
         // Handle ICE Candidates
         socket.on("ice-candidate", (candidate) => {
           if (candidate && peerConnection.current) {
-            peerConnection.current
-              .addIceCandidate(new RTCIceCandidate(candidate))
-              .catch((error) =>
-                console.error("Failed to add ICE candidate:", error)
-              );
+            peerConnection.current.addIceCandidate(
+              new RTCIceCandidate(candidate)
+            );
           }
         });
 
-        if (peerConnection.current) {
-          peerConnection.current.onicecandidate = (event) => {
-            if (event.candidate) {
-              socket.emit("ice-candidate", {
-                candidate: event.candidate,
-                roomId,
-              });
-            }
-          };
+        // Send ICE Candidates
+        peerConnection.current.onicecandidate = (event) => {
+          if (event.candidate) {
+            socket.emit("ice-candidate", {
+              candidate: event.candidate,
+              roomId,
+            });
+          }
+        };
 
-          // ✅ Fix 4: Ensure remote stream updates correctly
-          peerConnection.current.ontrack = (event) => {
-            if (remoteVideoRef.current) {
-              setTimeout(() => {
-                remoteVideoRef.current.srcObject = event.streams[0];
-              }, 100);
-            }
-            setIsConnected(true);
-          };
-        }
+        // ✅ Ensure Remote Video Updates
+        peerConnection.current.ontrack = (event) => {
+          if (remoteVideoRef.current) {
+            setTimeout(() => {
+              remoteVideoRef.current.srcObject = event.streams[0];
+            }, 100);
+          }
+          setIsConnected(true);
+        };
       } catch (error) {
         console.error("Error accessing media devices:", error);
       }
     };
 
     initializeCall();
-  }, [roomId]);
+  }, []);
 
   // Toggle Mic (Mute / Unmute)
   const handleToggleMic = () => {
