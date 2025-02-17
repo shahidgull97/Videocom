@@ -32,7 +32,7 @@ const VideoCall = () => {
       console.log("[CLIENT] initializeCall started"); // Log at the start
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: false,
+          video: true,
           audio: true,
         });
         console.log("[CLIENT] stream started"); // Log at the start
