@@ -11,8 +11,8 @@ import VideoControls from "../videoControls/videoControlls";
 // import ChatBox from "../components/ChatBox";
 import ChatBox from "../chatbox/chatbox";
 
-// const socket = io("http://videocom-backend.onrender.com");
-const socket = io("http://localhost:4000");
+const socket = io("http://videocom-backend.onrender.com");
+// const socket = io("http://localhost:4000");
 
 const VideoCall = () => {
   const { roomId } = useParams();
@@ -32,7 +32,7 @@ const VideoCall = () => {
       console.log("[CLIENT] initializeCall started"); // Log at the start
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: false,
           audio: true,
         });
         console.log("[CLIENT] stream started"); // Log at the start
@@ -96,23 +96,23 @@ const VideoCall = () => {
         });
 
         // Handle answer
-        socket.on("answer", async ({ answer, sender }) => {
-          console.log(`[CLIENT] Received answer from ${sender}`);
+        socket.on("answer", async ({ answer }) => {
+          console.log("[CLIENT] Received answer", answer);
 
           if (!peerConnection.current) {
             console.error("[CLIENT] PeerConnection is null, ignoring answer");
             return;
           }
 
-          // ✅ Only setRemoteDescription if connection state is not already stable
-          if (peerConnection.current.signalingState !== "stable") {
+          // ✅ Check if signaling state is "have-local-offer" before setting remote description
+          if (peerConnection.current.signalingState === "have-local-offer") {
             await peerConnection.current.setRemoteDescription(
               new RTCSessionDescription(answer)
             );
-            console.log("[CLIENT] Answer set successfully, call established!");
+            console.log("[CLIENT] Remote description set successfully.");
           } else {
             console.warn(
-              "[CLIENT] Ignoring answer: Connection is already stable"
+              `[CLIENT] Cannot set remote answer. Current signaling state: ${peerConnection.current.signalingState}`
             );
           }
         });
