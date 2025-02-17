@@ -18,7 +18,7 @@ const Signup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5000/api/auth/signup", formData);
+      await axios.post("https://localhost:5000/api/auth/signup", formData);
       alert("Signup Successful");
       navigate("/login");
     } catch (error) {

@@ -18,12 +18,12 @@
 
 .local-video {
   position: absolute;
-  /* top: 20px;
-  right: 20px; */
-  /* width: 280px; */
-  width: 100vw;
-  /* height: 158px; */
-  height: 100vh;
+  top: 20px;
+  right: 20px;
+  width: 280px;
+  /* width: 100vw; */
+  height: 158px;
+  /* height: 100vh; */
   border-radius: 16px;
   object-fit: cover;
   border: 2px solid rgba(255, 255, 255, 0.2);

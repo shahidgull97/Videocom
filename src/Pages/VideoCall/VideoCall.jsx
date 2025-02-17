@@ -11,8 +11,8 @@ import VideoControls from "../videoControls/videoControlls";
 // import ChatBox from "../components/ChatBox";
 import ChatBox from "../chatbox/chatbox";
 
-const socket = io("http://videocom-backend.onrender.com");
-// const socket = io("http://192.168.31.51:4000");
+// const socket = io("http://videocom-backend.onrender.com");
+const socket = io("http://localhost:4000");
 
 const VideoCall = () => {
   const { roomId } = useParams();
@@ -59,7 +59,7 @@ const VideoCall = () => {
 
           const offer = await peerConnection.current.createOffer();
           await peerConnection.current.setLocalDescription(offer);
-          socket.emit("offer", { offer, target: id });
+          socket.emit("offer", { offer, roomId: id });
         });
 
         // ✅ Now, join the room
@@ -69,32 +69,63 @@ const VideoCall = () => {
         console.log(`[CLIENT] Emitting join-room event for room: ${roomId}`);
 
         // Handle incoming offer
-        socket.on("offer", async ({ offer, target }) => {
-          if (!peerConnection.current) return;
+        socket.on("offer", async ({ offer, sender }) => {
+          console.log(`[CLIENT] Received offer from ${sender}`);
 
-          await peerConnection.current.setRemoteDescription(
-            new RTCSessionDescription(offer)
-          );
+          if (!peerConnection.current) {
+            console.error("[CLIENT] PeerConnection is null, ignoring offer");
+            return;
+          }
 
-          const answer = await peerConnection.current.createAnswer();
-          await peerConnection.current.setLocalDescription(answer);
-          socket.emit("answer", { answer, target });
+          // ✅ Only setRemoteDescription if we are not already handling an offer
+          if (peerConnection.current.signalingState === "stable") {
+            await peerConnection.current.setRemoteDescription(
+              new RTCSessionDescription(offer)
+            );
+
+            console.log("[CLIENT] Creating and sending answer...");
+            const answer = await peerConnection.current.createAnswer();
+            await peerConnection.current.setLocalDescription(answer);
+
+            socket.emit("answer", { answer, roomId });
+          } else {
+            console.warn(
+              "[CLIENT] Ignoring new offer: Connection is not stable yet"
+            );
+          }
         });
 
         // Handle answer
-        socket.on("answer", async ({ answer }) => {
-          if (!peerConnection.current) return;
-          await peerConnection.current.setRemoteDescription(
-            new RTCSessionDescription(answer)
-          );
+        socket.on("answer", async ({ answer, sender }) => {
+          console.log(`[CLIENT] Received answer from ${sender}`);
+
+          if (!peerConnection.current) {
+            console.error("[CLIENT] PeerConnection is null, ignoring answer");
+            return;
+          }
+
+          // ✅ Only setRemoteDescription if connection state is not already stable
+          if (peerConnection.current.signalingState !== "stable") {
+            await peerConnection.current.setRemoteDescription(
+              new RTCSessionDescription(answer)
+            );
+            console.log("[CLIENT] Answer set successfully, call established!");
+          } else {
+            console.warn(
+              "[CLIENT] Ignoring answer: Connection is already stable"
+            );
+          }
         });
 
         // Handle ICE Candidates
-        socket.on("ice-candidate", (candidate) => {
+        socket.on("ice-candidate", ({ candidate }) => {
           if (candidate && peerConnection.current) {
-            peerConnection.current.addIceCandidate(
-              new RTCIceCandidate(candidate)
-            );
+            console.log("Received ICE Candidate:", candidate);
+            peerConnection.current
+              .addIceCandidate(new RTCIceCandidate(candidate))
+              .catch((error) =>
+                console.error("Error adding ICE candidate", error)
+              );
           }
         });
 

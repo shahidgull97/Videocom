@@ -9,9 +9,13 @@ export default defineConfig({
   },
   base: "/",
   server: {
-    historyApiFallback: true,
-    host: "0.0.0.0", // Allow access from other devices
-    port: 5173, // Your frontend port
-    https: false, // Disable HTTPS
+    host: true, // Allows access from other devices
+    strictPort: true, // Ensures the specified port is used
+    port: 5173, // Change to your frontend port (default Vite port)
+    allowedHosts: [
+      "localhost",
+      "127.0.0.1",
+      "5ab1-2409-40d5-107f-a313-298c-f086-6bd1-de13.ngrok-free.app", // Add your current ngrok URL
+    ],
   },
 });
