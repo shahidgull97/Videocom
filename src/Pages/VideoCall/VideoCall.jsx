@@ -32,7 +32,7 @@ const VideoCall = () => {
       console.log("[CLIENT] initializeCall started"); // Log at the start
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
+          video: false,
           audio: true,
         });
         console.log("[CLIENT] stream started"); // Log at the start
@@ -186,21 +186,26 @@ const VideoCall = () => {
   };
 
   return (
-    <div className="video-call-container">
-      <video
-        ref={localVideoRef}
-        autoPlay
-        playsInline
-        muted
-        className="local-video"
-      />
-      <video
-        ref={remoteVideoRef}
-        autoPlay
-        playsInline
-        className="remote-video"
-      />
-      {!isConnected && <p>Waiting for another participant...</p>}
+    <>
+      <div className="video-call-container">
+        <video
+          ref={localVideoRef}
+          autoPlay
+          playsInline
+          muted
+          className="local-video"
+        />
+        {!isConnected ? (
+          <p>Waiting for another participant...</p>
+        ) : (
+          <video
+            ref={remoteVideoRef}
+            autoPlay
+            playsInline
+            className="remote-video"
+          />
+        )}
+      </div>
       <VideoControls
         onToggleMic={handleToggleMic}
         onToggleVideo={handleToggleVideo}
@@ -210,7 +215,7 @@ const VideoCall = () => {
       />
       <ChatBox socket={socket} roomId={roomId} />{" "}
       {/* ✅ Add ChatBox Component */}
-    </div>
+    </>
   );
 };
 
