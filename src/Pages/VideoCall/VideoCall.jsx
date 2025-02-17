@@ -11,7 +11,7 @@ import VideoControls from "../videoControls/videoControlls";
 // import ChatBox from "../components/ChatBox";
 import ChatBox from "../chatbox/chatbox";
 
-const socket = io("http://videocom-backend.onrender.com");
+const socket = io("https://videocom-backend.onrender.com");
 // const socket = io("http://localhost:4000");
 
 const VideoCall = () => {
@@ -32,7 +32,7 @@ const VideoCall = () => {
       console.log("[CLIENT] initializeCall started"); // Log at the start
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: false,
+          video: true,
           audio: true,
         });
         console.log("[CLIENT] stream started"); // Log at the start
@@ -184,16 +184,6 @@ const VideoCall = () => {
     socket.emit("leave-room", roomId);
     window.location.href = "/"; // Redirect to homepage after ending call
   };
-
-  // Send message function
-  //   const sendMessage = () => {
-  //     if (newMessage.trim()) {
-  //       const message = { text: newMessage, sender: "You" };
-  //       setMessages([...messages, message]);
-  //       socket.emit("send-message", { message, roomId });
-  //       setNewMessage("");
-  //     }
-  //   };
 
   return (
     <div className="video-call-container">
